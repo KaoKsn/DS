@@ -56,7 +56,7 @@ int main(void)
 
 	/*
 	 * Transpose the sparse matrix using fast transpose.
-	 * Time Complexity - O(rows + columns)
+	 * Time Complexity - O(3*t_values + columns)
 	 */
 
 	sparse_element transpose_sparse_a[t_values + 1];
@@ -130,20 +130,24 @@ void fast_transpose_sparse(sparse_element sparse_a[], sparse_element transpose_s
 	 * in ascending order of column values.
 	 */
 
-	int starting_pos[t_values + 1];
+	int starting_pos[t_columns];
 
 	// Initialize all total number of non-zero values in the column.
 	for(int i = 0; i < t_columns; i++)
 		r_values[i] = 0;
 
-	// Update the store total number of non-zero values in each columns.
+	// Update total number of non-zero values in each columns.
 	for(int i = 1; i < t_values + 1; i++)
 		r_values[sparse_a[i].columns]++;
 
-	// Populate the starting_pos matrix.
-	starting_pos[0] = 1;
-	for(int i = 1; i < t_values + 1; i++)
+	// Populate the starting_pos matrix with the starting indices for every column in the sparse matrix.
+	starting_pos[0] = 1; // Sparse of tranpose must start with column values of 0 in sparse of a.
+
+	for(int i = 1; i < t_columns; i++)
 	{
+		/* The starting position of the elements for the next column index must be:
+		 * total non-zero values at the previous col_index + starting position of the previous col_index
+		 */
 		starting_pos[i] = starting_pos[i-1] + r_values[i-1];
 	}
 
@@ -155,9 +159,9 @@ void fast_transpose_sparse(sparse_element sparse_a[], sparse_element transpose_s
 	// Look for the column value in the ascending order in the column section of the sparse matrix.
 	for(int i = 1; i < t_values + 1; i++)
 	{
-		transpose_sparse_a[starting_pos[sparse_a[i].columns]].rows = sparse_a[i].columns;
-		transpose_sparse_a[starting_pos[sparse_a[i].columns]].columns = sparse_a[i].rows;
-		transpose_sparse_a[starting_pos[sparse_a[i].columns]].values = sparse_a[i].values;
+		transpose_sparse_a[ starting_pos[sparse_a[i].columns] ].rows = sparse_a[i].columns;
+		transpose_sparse_a[ starting_pos[sparse_a[i].columns] ].columns = sparse_a[i].rows;
+		transpose_sparse_a[ starting_pos[sparse_a[i].columns] ].values = sparse_a[i].values;
 		starting_pos[sparse_a[i].columns]++;
 	}
 }
