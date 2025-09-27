@@ -1,4 +1,5 @@
 #include<stdio.h>
+#define INVALID_INPUTS -1
 
 typedef struct {
 	int rows, columns, values;
@@ -26,13 +27,22 @@ int main(void)
 	int a[r][c];
 	int t_values = get_matrix(r, c, a);
 
-	// Print matrix a.
-	printf("\nMatrix a: \n");
-	for(int i = 0; i < r; i++)
+	// Print matrix only on reading valid inputs for row and column.
+	if (t_values != -1)
 	{
-		for (int j = 0; j < c; j++)
-			printf("%d\t", a[i][j]);
-		printf("\n");
+		// Print matrix a.
+		printf("\nMatrix a: \n");
+		for(int i = 0; i < r; i++)
+		{
+			for (int j = 0; j < c; j++)
+				printf("%d\t", a[i][j]);
+			printf("\n");
+		}
+	}
+	else
+	{
+		printf("\nInvalid Input! Exiting...\n");
+		return INVALID_INPUTS;
 	}
 
 	// Convert the matrix to the sparse form.
@@ -49,15 +59,21 @@ int main(void)
 
 int get_matrix(int r, int c, int mat[][c])
 {
-	int t_values = 0;
-	printf("\nEnter the matrix a: \n");
-	for(int i = 0; i < r; i++)
+	int t_values = -1;
+
+	if (r != 0 && c != 0)
 	{
-		for (int j = 0; j < c; j++)
+		// Avoid losing the last non-zero value.
+		t_values = 0;
+		printf("\nEnter the matrix a: \n");
+		for(int i = 0; i < r; i++)
 		{
-			scanf("%d", &mat[i][j]);
-			if (mat[i][j])
-				t_values ++;
+			for (int j = 0; j < c; j++)
+			{
+				scanf("%d", &mat[i][j]);
+				if (mat[i][j])
+					t_values ++;
+			}
 		}
 	}
 	return t_values;
@@ -66,9 +82,9 @@ int get_matrix(int r, int c, int mat[][c])
 void get_sparse(int r, int c, int (*mat)[c],int t_values, sparse_element sparse_a[])
 {
 	// Initialize the first row of the sparse matrix.
-	sparse_a[0].rows = r; 
-	sparse_a[0].columns = c; 
-	sparse_a[0].values = t_values; 
+	sparse_a[0].rows = r;
+	sparse_a[0].columns = c;
+	sparse_a[0].values = t_values;
 
 	for(int i = 0, k = 1; i < r; i++)
 	{
