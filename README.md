@@ -3,6 +3,7 @@
 The repository is a collection of C programs that implement __data structures__.
 
 ## Repo Structure
+<pre>
 .
 ├── Builds
 │   ├── Lists
@@ -40,5 +41,5 @@ The repository is a collection of C programs that implement __data structures__.
         ├── infix_postfix.c
         ├── infix_postfix.h
         └── stack.c
-
+</pre>
 13 directories, 24 files
