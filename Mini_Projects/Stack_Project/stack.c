@@ -3,37 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(void)
-{
-  stack_t *stack = get_stack(2);
-  while (true)
-  {
-    int choice;
-    scanf("%d", &choice);
-
-    switch (choice)
-    {
-      case 0:
-        int value;
-        scanf("%d", &value);
-        push(stack, &value);
-        break;
-      case 1:
-        void *popped = pop(stack);
-        if (popped) {
-          printf("Popped!\n");
-        }
-        break;
-      case 2:
-        free_stack(stack);
-        return 0;
-      default:
-        printf("Invalid!\n");
-        continue;
-    }
-  }
-  return 0;
-}
 // Create a stack of the required capacity.
 stack_t *get_stack(size_t capacity)
 {
