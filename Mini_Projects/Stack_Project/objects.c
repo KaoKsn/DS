@@ -1,62 +1,76 @@
 #include "objects.h"
 
-object_t *get_array()
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+object_t *get_array(int capacity)
 {
   object_t *obj = malloc(sizeof(object_t));
   if (obj == NULL) {
     fprintf(stderr, "Memory Allocation for the object FAILED!\n");
     return NULL;
   }
-// Ensure to initialize with calloc
+  //NOTE: Ensure to initialize with calloc
   return obj;
 }
 
-object_t *get_bool()
+object_t *get_bool(bool value)
 {
   object_t *obj = malloc(sizeof(object_t));
   if (obj == NULL) {
     fprintf(stderr, "Memory Allocation for the object FAILED!\n");
     return NULL;
   }
+  obj->datatype = BOOLEAN;
+  obj->value.v_bool = value;
   return obj;
 }
 
-object_t *get_char()
+object_t *get_char(char value)
 {
   object_t *obj = malloc(sizeof(object_t));
   if (obj == NULL) {
     fprintf(stderr, "Memory Allocation for the object FAILED!\n");
     return NULL;
   }
+  obj->datatype = CHARACTER;
+  obj->value.v_char = value;
   return obj;
 }
 
-object_t *get_array()
+object_t *get_float(float value)
 {
   object_t *obj = malloc(sizeof(object_t));
   if (obj == NULL) {
     fprintf(stderr, "Memory Allocation for the object FAILED!\n");
     return NULL;
   }
+  obj->datatype = REAL;
+  obj->value.v_float = value;
   return obj;
 }
 
-object_t *get_array()
+object_t *get_int(int value)
 {
   object_t *obj = malloc(sizeof(object_t));
   if (obj == NULL) {
     fprintf(stderr, "Memory Allocation for the object FAILED!\n");
     return NULL;
   }
+  obj->datatype = INTEGER;
+  obj->value.v_int = value;
   return obj;
 }
 
-object_t *get_string()
+object_t *get_string(char *str)
 {
   object_t *obj = malloc(sizeof(object_t));
   if (obj == NULL) {
     fprintf(stderr, "Memory Allocation for the object FAILED!\n");
     return NULL;
+  } else if (str == NULL) {
+
   }
   return obj;
 }
@@ -81,11 +95,11 @@ void print_obj(object_t *obj)
           break;
       }
       break;
-    case CHAR:
+    case CHARACTER:
       printf("[CHARACTER]\n");
       printf("%c\n", obj->value.v_char);
       break;
-    case INT:
+    case INTEGER:
       printf("[INTEGER]\n");
       printf("%d\n", obj->value.v_int);
       break;
@@ -101,10 +115,10 @@ void print_obj(object_t *obj)
       break;
     case ARRAY:
       printf("[ARRAY]\n");
-      printf("len: %d\n", obj->value.array.len);
-      for (int i = 0; i < obj->value.array.len; i++) {
+      printf("len: %d\n", obj->value.array_t.len);
+      for (int i = 0; i < obj->value.array_t.len; i++) {
         printf("\nIndex: %d\n", i);
-        print_obj(obj->value.array.arr[i]);
+        print_obj(obj->value.array_t.arr[i]);
       }
       break;
   }
@@ -118,8 +132,8 @@ void free_obj(object_t *obj)
   }
   switch (obj->datatype) {
     case BOOLEAN:
-    case CHAR:
-    case INT:
+    case CHARACTER:
+    case INTEGER:
     case REAL:
       free(obj);
       break;
@@ -128,10 +142,10 @@ void free_obj(object_t *obj)
       free(obj);
       break;
     case ARRAY:
-      for (int i = 0; i < obj->value.array.len; i++) {
-        free_obj(obj->value.array.arr[i]);
+      for (int i = 0; i < obj->value.array_t.len; i++) {
+        free_obj(obj->value.array_t.arr[i]);
       }
-      free(obj->value.array.arr);
+      free(obj->value.array_t.arr);
       free(obj);
   }
 }
