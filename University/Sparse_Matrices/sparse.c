@@ -5,6 +5,7 @@ typedef struct {
 	int rows, columns, values;
 }sparse_element;
 
+int get_int();
 
 // int (*b)[c] - pointer that points to array with c elements.
 int get_matrix(int r, int c, int (*mat)[c]);
@@ -55,6 +56,23 @@ int main(void)
 	print_sparse(sparse_a);
 
 	return 0;
+}
+
+// Basic error handled, integer input.
+int get_int()
+{
+  int value;
+
+  while (true) {
+      if (scanf("%d", &value) != 1 || value <= 0) {
+          printf("Enter a positive integer!\n");
+          int buffer;
+          while (buffer = getchar() != '\n');
+      } else {
+          break;
+      }
+  }
+  return value;
 }
 
 int get_matrix(int r, int c, int mat[][c])
