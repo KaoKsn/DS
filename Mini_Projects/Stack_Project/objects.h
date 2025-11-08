@@ -7,32 +7,32 @@ typedef struct Object object_t;
 
 typedef enum Datatype
 {
-  BOOLEAN,
-  ARRAY,
-  CHARACTER,
-  REAL,
-  INTEGER,
-  STRING,
+    BOOLEAN,
+    ARRAY,
+    CHARACTER,
+    REAL,
+    INTEGER,
+    STRING,
 } datatype_t;
 
 typedef union Value
 {
-  struct Array {
-    object_t **arr;
-    int capacity;
-    int len;
-  } array_t;
-  float v_float;
-  int v_int;
-  char v_char;
-  char *v_string;
-  bool v_bool;
+    struct Array {
+        object_t **arr;
+        int capacity;
+        int len;
+    } array;
+    float v_float;
+    int v_int;
+    char v_char;
+    char *v_string;
+    bool v_bool;
 } value_t;
 
 typedef struct Object
 {
-  datatype_t datatype;
-  value_t value;
+    datatype_t datatype;
+    value_t value;
 } object_t;
 
 object_t *get_array(int capacity);
@@ -45,3 +45,6 @@ void print_obj(object_t *obj);
 void free_obj(object_t *obj);
 
 // NOTE: Declare array functions.
+int len(object_t *obj);
+void set_array(object_t *obj, int index, object_t *src_obj);
+object_t *get_element(object_t *obj, int index);

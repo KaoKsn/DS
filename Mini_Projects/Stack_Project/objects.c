@@ -12,16 +12,16 @@ object_t *get_array(int capacity)
         return NULL;
     }
     
-    obj->value.array_t.arr = calloc(capacity, sizeof(object_t *));
-    if (obj->value.array_t.arr == NULL) {
+    obj->value.array.arr = calloc(capacity, sizeof(object_t *));
+    if (obj->value.array.arr == NULL) {
         fprintf(stderr, "Failed Initializing an array of the requested size!\n");
         free(obj);
         return NULL;
     }
     // Initializing the array.
     obj->datatype = ARRAY;
-    obj->value.array_t.capacity = capacity;
-    obj->value.array_t.len = 0;
+    obj->value.array.capacity = capacity;
+    obj->value.array.len = 0;
     return obj;
 }
 
@@ -84,12 +84,14 @@ object_t *get_string(char *str)
           free(obj);
           return NULL;     
     }
-    char *string = calloc(strlen(str) + 1, sizeof(char));
+    int len_str = strlen(str);
+    char *string = calloc(len_str + 1, sizeof(char));
     if (string == NULL) {
         fprintf(stderr, "Mem Allocation for string failed!\n");
         free(obj);
         return NULL;
     }
+    strncpy(string, str, len_str);
     obj->datatype = STRING;
     obj->value.v_string = string;
     return obj;
@@ -134,10 +136,11 @@ void print_obj(object_t *obj)
             break;
         case ARRAY:
             printf("[ARRAY]\n");
-            printf("len: %d\n", obj->value.array_t.len);
-            for (int i = 0; i < obj->value.array_t.len; i++) {
+            printf("capacity: %d\n", obj->value.array.capacity);
+            printf("len: %d\n", obj->value.array.len);
+            for (int i = 0; i < obj->value.array.len; i++) {
                 printf("\nIndex: %d\n", i);
-                print_obj(obj->value.array_t.arr[i]);
+                print_obj(obj->value.array.arr[i]);
             }
             break;
         default:
@@ -146,6 +149,7 @@ void print_obj(object_t *obj)
 }
 
 // Free an object.
+/** Freeing an array recursively frees all its objects. **/
 void free_obj(object_t *obj)
 {
     if (obj == NULL) {
@@ -163,16 +167,30 @@ void free_obj(object_t *obj)
             free(obj);
             break;
         case ARRAY:
-            for (int i = 0; i < obj->value.array_t.len; i++) {
-                free_obj(obj->value.array_t.arr[i]);
+            for (int i = 0; i < obj->value.array.capacity; i++) {
+                // arr was calloc'd.
+                free_obj(obj->value.array.arr[i]);
             }
-            free(obj->value.array_t.arr);
+            free(obj->value.array.arr);
             free(obj);
             break;
         default:
-            fprintf(stderr, "Invalid Oject!\n");
+            fprintf(stderr, "Can't free an invalid oject!\n");
     }
     // Essential,
-    // Avoid problems dereferencing dangling pointers in the array. 
+    // Avoid problems dereferencing/freeing dangling pointers in the array. 
     obj == NULL;
+}
+
+// Object len, only defined for strings and arrays.
+int len(object_t *obj)
+{
+    if (obj == NULL || obj->datatype != ARRAY || obj->datatype != STRING) {
+        return -1;
+    }
+    if (obj->datatype == STRING) {
+        return strlen(obj->value.v_string);
+    }
+    // If array, returned the current number of elements in the array.
+    return obj->value.array.len;
 }
