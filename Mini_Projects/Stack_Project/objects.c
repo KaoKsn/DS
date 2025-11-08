@@ -11,7 +11,17 @@ object_t *get_array(int capacity)
     fprintf(stderr, "Memory Allocation for the object FAILED!\n");
     return NULL;
   }
-  //NOTE: Ensure to initialize with calloc
+  
+  obj->value.array_t.arr = calloc(capacity, sizeof(object_t *));
+  if (obj->value.array_t.arr == NULL) {
+    fprintf(stderr, "Failed Initializing an array of the requested size!\n");
+    free(obj);
+    return NULL;
+  }
+  // Initializing the array.
+  obj->datatype = ARRAY;
+  obj->value.array_t.capacity = capacity;
+  obj->value.array_t.len = 0;
   return obj;
 }
 
@@ -70,8 +80,18 @@ object_t *get_string(char *str)
     fprintf(stderr, "Memory Allocation for the object FAILED!\n");
     return NULL;
   } else if (str == NULL) {
-
+      fprintf(stderr, "Pushing NULL as char* dectected!\nAborting object creation...");
+      free(obj);
+      return NULL;     
   }
+  char *string = calloc(strlen(str) + 1, sizeof(char));
+  if (string == NULL) {
+    fprintf(stderr, "Mem Allocation for string failed!\n");
+    free(obj);
+    return NULL;
+  }
+  obj->datatype = STRING;
+  obj->value.v_string = string;
   return obj;
 }
 
@@ -109,7 +129,6 @@ void print_obj(object_t *obj)
       break;
     case STRING:
       printf("[STRING]\n");
-      // NOTE: Ensure, NULL can't be passed during creation of the object.
       printf("%s\n", obj->value.v_string);
       printf("len: %d\n", strlen(obj->value.v_string));
       break;
@@ -147,5 +166,9 @@ void free_obj(object_t *obj)
       }
       free(obj->value.array_t.arr);
       free(obj);
+      break;
   }
+  // Essential,
+  // Avoid problems dereferencing dangling pointers in the array. 
+  obj == NULL;
 }
