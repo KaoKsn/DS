@@ -1,23 +1,32 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
+
+typedef struct Object object_t;
 
 typedef enum Datatype
 {
+  BOOLEAN,
   ARRAY,
-  CHAR,
-  FLOAT,
-  INT,
+  CHARACTER,
+  REAL,
+  INTEGER,
   STRING,
 } datatype_t;
 
 typedef union Value
 {
+  struct Array {
+    object_t **arr;
+    int capacity;
+    int len;
+  } array_t;
   float v_float;
   int v_int;
   char v_char;
   char *v_string;
-  void *arr;
+  bool v_bool;
 } value_t;
 
 typedef struct Object
@@ -26,10 +35,13 @@ typedef struct Object
   value_t value;
 } object_t;
 
-object_t *get_array();
-object_t *get_char();
-object_t *get_float();
-object_t *get_int();
-object_t *get_string();
-void *print_obj(object_t *obj); 
+object_t *get_array(int capacity);
+object_t *get_bool(bool value);
+object_t *get_char(char value);
+object_t *get_float(float value);
+object_t *get_int(int value);
+object_t *get_string(char *str);
+void print_obj(object_t *obj); 
 void free_obj(object_t *obj);
+
+// NOTE: Declare array functions.
