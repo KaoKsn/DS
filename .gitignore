@@ -1,0 +1,14 @@
+# Personal todo files.
+todo.txt
+
+# Precompiled headers.
+.gch
+.pch
+
+# Executables
+.out
+.exe
+
+# Object files.
+.o
+.obj
