@@ -15,23 +15,6 @@ void delete_element(stack_element **stack);
 void print_stack(stack_element *stack);
 void free_stack(stack_element *stack);
 
-int main(void){
-  stack_element *stack = create_stack();
-  printf("Current length of the stack: %d\n", stack_size);
-
-  insert_element(&stack);
-  printf("Length after insertion into the stack: %d\n", stack_size);
-
-  delete_element(&stack);
-  printf("Length after deletion from the stack: %d\n", stack_size);
-
-  print_stack(stack);
-
-  free_stack(stack);
-
-  return 0;
-}
-
 stack_element *create_stack(){
   stack_element *stack = NULL;
 
@@ -80,7 +63,6 @@ stack_element *create_stack(){
 
 // Inserting an element into the stack.
 void insert_element(stack_element **stack){
-  // NOTE: : Multiple element insertion at once can easily be supported.
   stack_element *node = (stack_element *)malloc(sizeof(stack_element));
   
   printf("\n+++ Insertion +++\n");
