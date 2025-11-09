@@ -138,8 +138,12 @@ void print_obj(object_t *obj)
             printf("[ARRAY]\n");
             printf("capacity: %d\n", obj->value.array.capacity);
             printf("len: %d\n", obj->value.array.len);
-            for (int i = 0; i < obj->value.array.len; i++) {
+            for (int i = 0; i < obj->value.array.capacity; i++) {
                 printf("\nIndex: %d\n", i);
+                if (obj->value.array.arr[i] == NULL) {
+                    printf("Nothing at this index.\n");    
+                    continue;
+                }
                 print_obj(obj->value.array.arr[i]);
             }
             break;
@@ -193,4 +197,55 @@ int len(object_t *obj)
     }
     // If array, returned the current number of elements in the array.
     return obj->value.array.len;
+}
+
+void set_array(object_t *obj, int index, object_t *src)
+{
+    if (obj == NULL || src == NULL) {
+        fprintf(stderr, "Invalid Usage!\n");
+        return;
+    } else if (obj->datatype != ARRAY) {
+        fprintf(stderr, "Object is not an array!\n");
+        // NOTE: Need not free src, if implementing a GC.
+        return;
+    } else if (index < 0 || index > obj->value.array.capacity) {
+        fprintf(stderr, "Indexing out of bounds!\n");
+        return;
+    } else if (index == obj->value.array.capacity) {
+          // Increase the capacity of the array, if full.
+          object_t **tmp = realloc(obj->value.array.arr, sizeof(object_t *) * (obj->value.array.capacity + 4));
+          if (tmp == NULL) {
+              fprintf(stderr, "Can't resize the array to fit the index. Aborting insertion!\n");
+              return;
+          }
+          obj->value.array.arr = tmp;
+          obj->value.array.capacity += 4;
+          // Initialize to NULL to avoid dereferencing dangling pointers while printing.
+          for (int i = index + 1; i < obj->value.array.capacity; i++) {
+              obj->value.array.arr[i] = NULL;
+          }
+          obj->value.array.arr[index] = src;
+          obj->value.array.len++;
+    } else {
+          if (obj->value.array.arr[index] == NULL) {
+              obj->value.array.len++;
+          }
+          free_obj(obj->value.array.arr[index]);
+          obj->value.array.arr[index] = src;
+    }
+    return;
+}
+
+object_t *get_element(object_t *obj, int index)
+{
+    if (obj == NULL || obj->datatype != ARRAY) {
+        fprintf(stderr, "Invalid Object! Can't index into it!\n");
+        return NULL;
+    } else if (index >= obj->value.array.capacity || index < 0) {
+        fprintf(stderr, "Can't index out of bounds!\n");
+        return NULL;
+    } else if (obj->value.array.arr[index] == NULL) {
+        fprintf(stderr, "Nothing at this index!\n");
+    }
+    return obj->value.array.arr[index];
 }
