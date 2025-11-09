@@ -1,0 +1,34 @@
+Can't handle self referencing arrays. Both printing and freeing.
+
+int main(){
+    object_t *objects[7] = {
+        get_int(3),
+        get_float(5.5),
+        get_string("thisstring"),
+        get_char('c'),
+        get_bool(true),
+        get_array(3),
+        get_string("second")
+    };
+
+    // ***** Failure Point ******
+    set_array(objects[5], 4, objects[1]);
+    // Causes free of objects[1] since the dec_refcount is called. def_counter accounts for NULL
+    for (int i = 0; i < 7; i++) {
+        if ( i != 1)
+            dec_refcount(objects[i]);
+    }
+    return 0;
+}
+obj = NULL after free doesn't work since obj is in the local stack frame that just points to the memory in heap.
+
+
+Calling set_array() at boundary all the time.
+A potential fix - Allow only fixed size arrays.
+
+set_array() does dec_refcount(src) on failure.
+Can be catastrophic if 
+    1. It's an object being used as a normal variable and not just a passing parameter.
+    and has a refcount of 1. -- Freed prematurely.
+set_array(array_obj, index, get_int(3)) -- OK on failure.
+set_array(array_obj, index, some_other_obj) -- DANGEROUS on failure.
