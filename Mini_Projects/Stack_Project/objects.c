@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-object_t *get_array(int capacity)
+object_t *get_array(size_t capacity)
 {
     object_t *obj = malloc(sizeof(object_t));
     if (obj == NULL) {
@@ -199,24 +199,24 @@ int len(object_t *obj)
     return obj->value.array.len;
 }
 
-void set_array(object_t *obj, int index, object_t *src)
+bool set_array(object_t *obj, int index, object_t *src)
 {
     if (obj == NULL || src == NULL) {
         fprintf(stderr, "Invalid Usage!\n");
-        return;
+        return false;
     } else if (obj->datatype != ARRAY) {
         fprintf(stderr, "Object is not an array!\n");
         // NOTE: Need not free src, if implementing a GC.
-        return;
+        return false;
     } else if (index < 0 || index > obj->value.array.capacity) {
         fprintf(stderr, "Indexing out of bounds!\n");
-        return;
+        return false;
     } else if (index == obj->value.array.capacity) {
           // Increase the capacity of the array, if full.
           object_t **tmp = realloc(obj->value.array.arr, sizeof(object_t *) * (obj->value.array.capacity + 4));
           if (tmp == NULL) {
               fprintf(stderr, "Can't resize the array to fit the index. Aborting insertion!\n");
-              return;
+              return false;
           }
           obj->value.array.arr = tmp;
           obj->value.array.capacity += 4;
@@ -233,7 +233,7 @@ void set_array(object_t *obj, int index, object_t *src)
           free_obj(obj->value.array.arr[index]);
           obj->value.array.arr[index] = src;
     }
-    return;
+    return true;
 }
 
 object_t *get_element(object_t *obj, int index)

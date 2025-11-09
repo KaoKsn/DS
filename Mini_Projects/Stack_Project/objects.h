@@ -35,7 +35,7 @@ typedef struct Object
     value_t value;
 } object_t;
 
-object_t *get_array(int capacity);
+object_t *get_array(size_t capacity);
 object_t *get_bool(bool value);
 object_t *get_char(char value);
 object_t *get_float(float value);
@@ -44,7 +44,6 @@ object_t *get_string(char *str);
 void print_obj(object_t *obj); 
 void free_obj(object_t *obj);
 
-// NOTE: Declare array functions.
 int len(object_t *obj);
-void set_array(object_t *obj, int index, object_t *src_obj);
+bool set_array(object_t *obj, int index, object_t *src_obj);
 object_t *get_element(object_t *obj, int index);
