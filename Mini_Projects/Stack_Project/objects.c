@@ -189,14 +189,18 @@ void free_obj(object_t *obj)
 // Object len, only defined for strings and arrays.
 int len(object_t *obj)
 {
-    if (obj == NULL || obj->datatype != ARRAY || obj->datatype != STRING) {
+    if (obj == NULL) {
         return -1;
     }
-    if (obj->datatype == STRING) {
-        return strlen(obj->value.v_string);
+    switch (obj->datatype) {
+        case CHARACTER:
+        case INTEGER:
+        case REAL:
+        case BOOLEAN: return 1;
+        case STRING: return strlen(obj->value.v_string);
+        case ARRAY: return obj->value.array.len; // return current length.
+        default: return -1;
     }
-    // If array, returned the current number of elements in the array.
-    return obj->value.array.len;
 }
 
 bool set_array(object_t *obj, int index, object_t *src)
