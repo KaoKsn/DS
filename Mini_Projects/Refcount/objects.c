@@ -7,31 +7,39 @@
 #define CAPACITY_INCREMENTER 4
 
 int main(){
-    object_t *objects[7] = {
-      get_int(3),
-      get_float(5.5),
-      get_string("thisstring"),
-      get_char('c'),
-      get_bool(true),
-      get_array(3),
-      get_string("second")
-    };
+      object_t *objects[7] = {
+          get_int(3),
+          get_float(5.5),
+          get_string("thisstring"),
+          get_char('c'),
+          get_bool(true),
+          get_array(3),
+          get_string("second")
+      };
 
-    object_t *inte = get_int(4);
-    object_t *aray = get_array(3);
-    set_array(aray, 1, inte);
-    set_array(objects[5], 3, objects[1]);
-    set_array(objects[5], 3, aray);
+      object_t *inte = get_int(4);
+      object_t *aray = get_array(3);
+      set_array(aray, 1, &inte);
+      set_array(objects[5], 3, &objects[1]);
+      print_obj(objects[5]);
+      printf("\n");
+      set_array(objects[5], 3, &aray);
 
-    print_obj(aray);
-    print_obj(objects[6]);
-    print_obj(objects[5]);
-    for (int i = 0; i < 7; i++) {
-        dec_refcount(objects[i]);
-  }
-  dec_refcount(aray);
-  dec_refcount(inte);
-  return 0;
+      print_obj(aray);
+      print_obj(objects[6]);
+      print_obj(objects[5]);
+      print_obj(get_element(objects[5], 1));
+
+      printf("\nPrinting all objects\n");
+      for (int i = 0; i < 7; i++) {
+          print_obj(objects[i]);
+      }
+      for (int i = 0; i < 7; i++) {
+          dec_refcount(&objects[i]);
+    }
+    dec_refcount(&aray);
+    dec_refcount(&inte);
+    return 0;
 }
 
 object_t *get_object()
@@ -54,15 +62,15 @@ void inc_refcount(object_t *obj)
     return;
 }
 
-void dec_refcount(object_t *obj)
+void dec_refcount(object_t **obj)
 {
-    if (obj == NULL) {
+    if (obj == NULL || *obj == NULL) {
         return;
     }
-    obj->refcount--;
+    (*obj)->refcount--;
     // If references still exist, do nothing.
-    if (obj->refcount == 0) {
-        free_obj(obj);
+    if ((*obj)->refcount == 0) {
+        *obj = free_obj(*obj);
     }
 }
 
@@ -213,10 +221,10 @@ void print_obj(object_t *obj)
 
 // Free an object.
 /** Freeing an array recursively frees all its objects. **/
-void free_obj(object_t *obj)
+void *free_obj(object_t *obj)
 {
     if (obj == NULL) {
-        return;
+        return NULL;
     }
     switch (obj->datatype) {
         case BOOLEAN:
@@ -231,16 +239,16 @@ void free_obj(object_t *obj)
         case ARRAY:
             for (int i = 0; i < obj->value.array.capacity; i++) {
                 // arr was calloc'd.
-                dec_refcount(obj->value.array.arr[i]);
+                dec_refcount(&(obj->value.array.arr[i]));
             }
             free(obj->value.array.arr);
             break;
         default:
             fprintf(stderr, "Can't free an invalid oject!\n");
-            return;
+            return NULL;
     }
     free(obj);
-    return;
+    return NULL;
 }
 
 // Object len, only defined for strings and arrays.
@@ -260,9 +268,9 @@ int len(object_t *obj)
     }
 }
 
-bool set_array(object_t *obj, int index, object_t *src)
+bool set_array(object_t *obj, int index, object_t **src)
 {
-    if (obj == NULL || src == NULL) {
+    if (obj == NULL || src == NULL || *src == NULL) {
         fprintf(stderr, "Invalid Usage!\n");
         return false;
     } else if (obj->datatype != ARRAY) {
@@ -271,18 +279,18 @@ bool set_array(object_t *obj, int index, object_t *src)
          * objects created just to pass and 
          * oridinary object that exists for other reasons too.
          */
-        dec_refcount(src);
+        // dec_refcount(src); - Not required since passing such objects is prohibited.
         return false;
     } else if (index < 0 || index > obj->value.array.capacity) {
         fprintf(stderr, "Indexing out of bounds!\n");
-        dec_refcount(src);
+        // dec_refcount(src);
         return false;
     } else if (index == obj->value.array.capacity) {
           // Increase the capacity of the array, if full.
           object_t **tmp = realloc(obj->value.array.arr, sizeof(object_t *) * (obj->value.array.capacity + CAPACITY_INCREMENTER));
           if (tmp == NULL) {
               fprintf(stderr, "Can't resize the array to fit the index. Aborting insertion!\n");
-              dec_refcount(src);
+              // dec_refcount(src);
               return false;
           }
           obj->value.array.arr = tmp;
@@ -292,12 +300,12 @@ bool set_array(object_t *obj, int index, object_t *src)
               obj->value.array.arr[i] = NULL;
           }
     } else if (obj->value.array.arr[index] != NULL) {
-              dec_refcount(obj->value.array.arr[index]);
+              dec_refcount(&(obj->value.array.arr[index]));
               obj->value.array.len--;
     }
     obj->value.array.len++;
-    obj->value.array.arr[index] = src;
-    inc_refcount(src);
+    obj->value.array.arr[index] = *src;
+    inc_refcount(*src);
     return true;
 }
 

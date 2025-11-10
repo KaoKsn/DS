@@ -44,11 +44,11 @@ object_t *get_float(float value);
 object_t *get_int(int value);
 object_t *get_string(char *str);
 void print_obj(object_t *obj); 
-void free_obj(object_t *obj);
+void *free_obj(object_t *obj);
 
 int len(object_t *obj);
-bool set_array(object_t *obj, int index, object_t *src_obj);
+bool set_array(object_t *obj, int index, object_t **src_obj);
 object_t *get_element(object_t *obj, int index);
 
 void inc_refcount(object_t *obj);
-void dec_refcount(object_t *obj);
+void dec_refcount(object_t **obj);

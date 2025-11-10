@@ -20,7 +20,7 @@ int main(){
     }
     return 0;
 }
-obj = NULL after free doesn't work since obj is in the local stack frame that just points to the memory in heap.
+
 
 
 Calling set_array() at boundary all the time.
@@ -32,3 +32,22 @@ Can be catastrophic if
     and has a refcount of 1. -- Freed prematurely.
 set_array(array_obj, index, get_int(3)) -- OK on failure.
 set_array(array_obj, index, some_other_obj) -- DANGEROUS on failure.
+
+-- Doesn't validate inputs in most cases!
+
+
+
+
+-- Fixed.
+obj = NULL after free doesn't work since obj is in the local stack frame that just points to the memory in heap.
+pass a object_t ** to both set_array and dec_refcount so that 
+they can directly assign NULL to the object* itself and not a copy of it in the stack frame.
+This also required free_obj to return NULL on failure or completion.
+
+-- Fix: Pass the pointer to the object pointer, to any function that tries to dec_refcount so that you can manipulate the original object_t* and set it to NULL on 0.
+
+In a normal case.
+Dec_refcount called(**obj) -> *obj passed to free_obj() if refcount = 0 -> returns NULL -> assigned to object*. 
+
+Still the problem of freeing the object exists.But now you can't pass an object argument that was just created for passing
+Ex: set_array(array, index, &(get_int(3))); -- lvalue required.
