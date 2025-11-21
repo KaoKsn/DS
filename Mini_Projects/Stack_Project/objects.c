@@ -4,11 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-object_t *get_array(size_t capacity)
+object_t *get_obj(vm_t *vm)
 {
     object_t *obj = malloc(sizeof(object_t));
     if (obj == NULL) {
         fprintf(stderr, "Memory Allocation for the object FAILED!\n");
+        return NULL;
+    }
+    vm_track_object(vm, obj);
+    return obj;
+}
+
+object_t *get_array(vm_t *vm, size_t capacity)
+{
+    object_t *obj = get_obj(vm);
+    if (obj == NULL) {
         return NULL;
     }
     
@@ -25,11 +35,10 @@ object_t *get_array(size_t capacity)
     return obj;
 }
 
-object_t *get_bool(bool value)
+object_t *get_bool(vm_t *vm, bool value)
 {
-    object_t *obj = malloc(sizeof(object_t));
+    object_t *obj = get_obj(vm);
     if (obj == NULL) {
-        fprintf(stderr, "Memory Allocation for the object FAILED!\n");
         return NULL;
     }
     obj->datatype = BOOLEAN;
@@ -37,11 +46,10 @@ object_t *get_bool(bool value)
     return obj;
 }
 
-object_t *get_char(char value)
+object_t *get_char(vm_t *vm, char value)
 {
-    object_t *obj = malloc(sizeof(object_t));
+    object_t *obj = get_obj(vm);
     if (obj == NULL) {
-        fprintf(stderr, "Memory Allocation for the object FAILED!\n");
         return NULL;
     }
     obj->datatype = CHARACTER;
@@ -49,11 +57,10 @@ object_t *get_char(char value)
     return obj;
 }
 
-object_t *get_float(float value)
+object_t *get_float(vm_t *vm, float value)
 {
-    object_t *obj = malloc(sizeof(object_t));
+    object_t *obj = get_obj(vm);
     if (obj == NULL) {
-        fprintf(stderr, "Memory Allocation for the object FAILED!\n");
         return NULL;
     }
     obj->datatype = REAL;
@@ -61,11 +68,10 @@ object_t *get_float(float value)
     return obj;
 }
 
-object_t *get_int(int value)
+object_t *get_int(vm_t *vm, int value)
 {
-    object_t *obj = malloc(sizeof(object_t));
+    object_t *obj = get_obj(vm);
     if (obj == NULL) {
-        fprintf(stderr, "Memory Allocation for the object FAILED!\n");
         return NULL;
     }
     obj->datatype = INTEGER;
@@ -73,11 +79,10 @@ object_t *get_int(int value)
     return obj;
 }
 
-object_t *get_string(char *str)
+object_t *get_string(vm_t *vm, char *str)
 {
-    object_t *obj = malloc(sizeof(object_t));
+    object_t *obj = get_obj(vm);
     if (obj == NULL) {
-        fprintf(stderr, "Memory Allocation for the object FAILED!\n");
         return NULL;
     } else if (str == NULL) {
           fprintf(stderr, "Pushing NULL as char* dectected!\nAborting object creation...");
@@ -183,7 +188,7 @@ void free_obj(object_t *obj)
     }
     // Essential,
     // Avoid problems dereferencing/freeing dangling pointers in the array. 
-    obj == NULL;
+    obj = NULL;
 }
 
 // Object len, only defined for strings and arrays.

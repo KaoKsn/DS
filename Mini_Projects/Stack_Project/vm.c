@@ -1,4 +1,5 @@
 #include "vm.h"
+#include <stdio.h>
 
 vm_t *create_vm()
 {
@@ -12,13 +13,13 @@ vm_t *create_vm()
     if (vm->frames == NULL) {
         free(vm);
         fprintf(stderr, "Failed to initialize a stack frame!\n");
-      return;
+      return NULL;
     }
     vm->objects = get_stack(8);
     if (vm->objects == NULL) {
         free(vm);
         fprintf(stderr, "Failed to initialize an object frame!\n");
-        return;
+        return NULL;
     }
     return vm;
 }
@@ -52,7 +53,7 @@ frame_t *get_frame(vm_t *vm)
         fprintf(stderr, "Failed creating references for the frame!\n");
         return NULL;
     }
-    vm_frame_push(vm, frame);
+    vm_push_frame(vm, frame);
     return frame;
 }
 
@@ -70,7 +71,7 @@ void free_frame(frame_t *frame)
     if (frame == NULL) {
         return;
     }
-    stack_free(frame->references);
+    free_stack(frame->references);
     free(frame);
 }
 

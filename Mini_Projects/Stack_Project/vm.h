@@ -1,3 +1,11 @@
+#ifndef VM_H
+#define VM_H
+
+typedef struct VM vm_t;
+#include "stack.h"
+#include "objects.h"
+#include <stdlib.h>
+
 // A VM is a container that has stack of frames and stack of objects.
 typedef struct VM {
     stack_t *frames;
@@ -19,3 +27,4 @@ void free_frame(frame_t *frame);
 
 void vm_track_object(vm_t *vm, object_t *obj);
 
+#endif
