@@ -29,8 +29,16 @@ void free_vm(vm_t *vm)
     if (vm == NULL) {
         return;
     }
-    // Free both the frames and objects stack.
+    // Free all the frames in the VM.
+    for (int i = 0; i < vm->frames->top; i++) {
+        // Free every frame.
+        free_frame(vm->frames->data[i]);
+    }
     free_stack(vm->frames);
+    // Free all the objects associated to the VM.
+    for (int i = 0; i < vm->objects->top; i++) {
+        free_obj(vm->objects->data[i]);
+    }
     free_stack(vm->objects);
     free(vm);
 }
@@ -57,6 +65,7 @@ frame_t *get_frame(vm_t *vm)
     return frame;
 }
 
+// A wrapper function to push the frame into the VM after its creation.
 void vm_push_frame(vm_t *vm, frame_t *frame)
 {
     if (vm == NULL || frame == NULL) {
@@ -66,20 +75,33 @@ void vm_push_frame(vm_t *vm, frame_t *frame)
     return;
 }
 
+// Free a particular frame.
 void free_frame(frame_t *frame)
 {
     if (frame == NULL) {
         return;
     }
+    // Free frame->references->data.
+    // Objects not freed.
     free_stack(frame->references);
     free(frame);
 }
 
+// Push an object to the objects stack of the VM.
 void vm_track_object(vm_t *vm, object_t *obj)
 {
-  if (vm == NULL || obj == NULL){
+    if (vm == NULL || obj == NULL){
+        return;
+    }
+    push(vm->objects, (void*)obj);
     return;
-  }
-  push(vm->objects, (void*)obj);
-  return;
+}
+
+// Push an object into the frame.
+void frame_reference_obj(frame_t *frame, object_t *obj)
+{
+    if (frame == NULL || obj == NULL) {
+        return;
+    }
+    push(frame->references, (void *)obj);
 }

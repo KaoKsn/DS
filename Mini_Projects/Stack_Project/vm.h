@@ -8,12 +8,14 @@ typedef struct VM vm_t;
 
 // A VM is a container that has stack of frames and stack of objects.
 typedef struct VM {
+    // frames is a stack of stacks.
     stack_t *frames;
     stack_t *objects;
 } vm_t;
 
 // A frame is a stack of references.
 typedef struct Frame {
+    // Objects that a frame references.
     stack_t *references;
 } frame_t;
 
@@ -26,5 +28,5 @@ frame_t *get_frame(vm_t *vm);
 void free_frame(frame_t *frame);
 
 void vm_track_object(vm_t *vm, object_t *obj);
-
+void frame_reference_obj(frame_t *frame, object_t *obj);
 #endif

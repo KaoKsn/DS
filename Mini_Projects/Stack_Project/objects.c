@@ -6,7 +6,7 @@
 
 object_t *get_obj(vm_t *vm)
 {
-    object_t *obj = malloc(sizeof(object_t));
+    object_t *obj = calloc(1, sizeof(object_t));
     if (obj == NULL) {
         fprintf(stderr, "Memory Allocation for the object FAILED!\n");
         return NULL;
@@ -169,26 +169,20 @@ void free_obj(object_t *obj)
         case CHARACTER:
         case INTEGER:
         case REAL:
-            free(obj);
             break;
         case STRING:
+            // Just free the heap allocated to char * i.e v_string.
             free(obj->value.v_string);
-            free(obj);
             break;
         case ARRAY:
-            for (int i = 0; i < obj->value.array.capacity; i++) {
-                // arr was calloc'd.
-                free_obj(obj->value.array.arr[i]);
-            }
+            // Just free the void ** holding elements and not the objects itself.
             free(obj->value.array.arr);
-            free(obj);
             break;
         default:
             fprintf(stderr, "Can't free an invalid oject!\n");
+            return;
     }
-    // Essential,
-    // Avoid problems dereferencing/freeing dangling pointers in the array. 
-    obj = NULL;
+    free(obj);
 }
 
 // Object len, only defined for strings and arrays.
