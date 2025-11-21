@@ -35,9 +35,9 @@ typedef struct Object
 {
     datatype_t datatype;
     value_t value;
+    bool is_marked;
 } object_t;
 
-#include "vm.h"
 object_t *get_obj(vm_t *vm);
 object_t *get_array(vm_t *vm, size_t capacity);
 object_t *get_bool(vm_t *vm, bool value);

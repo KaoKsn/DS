@@ -105,3 +105,22 @@ void frame_reference_obj(frame_t *frame, object_t *obj)
     }
     push(frame->references, (void *)obj);
 }
+
+// Iterate over each frame and set is_marked=true for every object that is referenced.
+void mark(vm_t *vm)
+{
+    if (vm == NULL) {
+        return;
+    }
+    // vm->frames <==> Stack of frames.
+    // vm->frames->data[i] <==> A frame(stack of references).
+    // vm->frames->data[i]->references->data[i] <==> object in the frame.
+    for (int i = 0; i < vm->frames->top; i++) {
+        // NOTE: A frame is pushed as void*
+        frame_t *frame = vm->frames->data[i];
+        for (int j = 0; j < frame->references->top; j++) {
+            object_t *obj = frame->references->data[j];
+            obj->is_marked = true;
+        }
+    }
+}

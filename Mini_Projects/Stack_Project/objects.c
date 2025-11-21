@@ -12,6 +12,7 @@ object_t *get_obj(vm_t *vm)
         return NULL;
     }
     vm_track_object(vm, obj);
+    obj->is_marked = false;
     return obj;
 }
 
