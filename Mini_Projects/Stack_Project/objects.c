@@ -210,20 +210,19 @@ bool set_array(object_t *obj, int index, object_t *src)
         return false;
     } else if (obj->datatype != ARRAY) {
         fprintf(stderr, "Object is not an array!\n");
-        // NOTE: Need not free src, if implementing a GC.
         return false;
     } else if (index < 0 || index > obj->value.array.capacity) {
         fprintf(stderr, "Indexing out of bounds!\n");
         return false;
     } else if (index == obj->value.array.capacity) {
           // Increase the capacity of the array, if full.
-          object_t **tmp = realloc(obj->value.array.arr, sizeof(object_t *) * (obj->value.array.capacity + 4));
+          object_t **tmp = realloc(obj->value.array.arr, sizeof(object_t *) * (obj->value.array.capacity + ARRAY_SIZE_INCREMENT));
           if (tmp == NULL) {
               fprintf(stderr, "Can't resize the array to fit the index. Aborting insertion!\n");
               return false;
           }
           obj->value.array.arr = tmp;
-          obj->value.array.capacity += 4;
+          obj->value.array.capacity += ARRAY_SIZE_INCREMENT;
           // Initialize to NULL to avoid dereferencing dangling pointers while printing.
           for (int i = index + 1; i < obj->value.array.capacity; i++) {
               obj->value.array.arr[i] = NULL;
@@ -234,8 +233,9 @@ bool set_array(object_t *obj, int index, object_t *src)
           if (obj->value.array.arr[index] == NULL) {
               obj->value.array.len++;
           }
-          free_obj(obj->value.array.arr[index]);
           obj->value.array.arr[index] = src;
+          // Leave the replaced object as is.
+          // The GC will free it if it is not referenced anywhere else.
     }
     return true;
 }

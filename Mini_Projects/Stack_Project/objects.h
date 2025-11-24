@@ -1,6 +1,7 @@
 #ifndef OBJECTS_H
 #define OBJECTS_H
 
+#define ARRAY_SIZE_INCREMENT 4
 typedef struct Object object_t;
 
 #include <stdbool.h>
