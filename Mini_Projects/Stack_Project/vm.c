@@ -98,6 +98,7 @@ void vm_track_object(vm_t *vm, object_t *obj)
 }
 
 // Push an object into the frame.
+// so that we know that an object is referenced inside a frame.
 void frame_reference_obj(frame_t *frame, object_t *obj)
 {
     if (frame == NULL || obj == NULL) {
@@ -116,11 +117,34 @@ void mark(vm_t *vm)
     // vm->frames->data[i] <==> A frame(stack of references).
     // vm->frames->data[i]->references->data[i] <==> object in the frame.
     for (int i = 0; i < vm->frames->top; i++) {
-        // NOTE: A frame is pushed as void*
+        // NOTE: A frame(a stack element) is pushed as void*
         frame_t *frame = vm->frames->data[i];
         for (int j = 0; j < frame->references->top; j++) {
             object_t *obj = frame->references->data[j];
             obj->is_marked = true;
         }
     }
+}
+
+// Sweep phase of the MnS.
+void sweep(vm_t *vm)
+{
+    if (vm == NULL) {
+        return;
+    }
+    for (int i = 0; i < vm->objects->top; i++) {
+      // Cast the objects in the vm, and free if not referenced.
+      object_t *obj = vm->objects->data[i];
+      if (obj->is_marked) {
+          // Reset is_marked i.e set them up for the next GC cycle.
+          obj->is_marked = false;
+      } else {
+          free_obj(obj);
+          // obj = NULL <not the right thing to do>
+          vm->objects->data[i] = NULL;
+      }
+    }
+    // Clean the stack.
+    stack_remove_nulls(vm->objects);
+    return;
 }

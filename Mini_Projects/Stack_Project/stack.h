@@ -14,6 +14,6 @@ typedef struct Stack
 stack_t *get_stack(size_t capacity);
 void push(stack_t *stack, void *obj);
 void *pop(stack_t *stack);
+void stack_remove_nulls(stack_t *stack);
 void free_stack(stack_t *stack);
-
 #endif

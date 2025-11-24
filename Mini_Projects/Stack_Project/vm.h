@@ -31,4 +31,5 @@ void vm_track_object(vm_t *vm, object_t *obj);
 void frame_reference_obj(frame_t *frame, object_t *obj);
 
 void mark(vm_t *vm);
+void sweep(vm_t *vm);
 #endif

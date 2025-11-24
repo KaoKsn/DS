@@ -53,6 +53,27 @@ void *pop(stack_t *stack)
   return stack->data[--(stack->top)];
 }
 
+// Clean the stack, by removing the NULL objects from the stack.
+void stack_remove_nulls(stack_t *stack)
+{
+    if (stack == NULL) {
+        return;
+    }
+    int new_top = 0;
+    for (int i = 0; i < stack->top; i++) {
+        if (stack->data[i] != NULL) {
+            stack->data[new_top++] = stack->data[i];
+        }
+    }
+    stack->top = new_top;
+    
+    // NULL out the remaining pointers.
+    for (int i = stack->top; i < stack->capacity; i++) {
+        stack->data[i] = NULL;
+    }
+    return;
+}
+
 // Freeing the stack.
 // Prerequisite: Memory allocated for data must be freed before hand.
 void free_stack(stack_t *stack)
