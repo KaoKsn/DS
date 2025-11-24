@@ -126,6 +126,86 @@ void mark(vm_t *vm)
     }
 }
 
+// Trace part of the mark phase. Look for objects referenced by the root object
+// Root objects -> objects found in the mark phase.
+
+// Collect the root objects so that they can be probed for child objects.
+void trace(vm_t *vm)
+{
+    if (vm == NULL) {
+        return;
+    }
+    stack_t *grey_objects = get_stack(8);
+    if (grey_objects == NULL) {
+        return;
+    }
+    for (int i = 0; i < vm->objects->top; i++) {
+        object_t *obj = vm->objects->data[i];
+        // If the object is marked, push it to grey_objects stack.
+        // This is done to ensure that we can mark any child objects that this object might have
+        // <eg. in arrays>
+        if (obj && obj->is_marked) {
+            push(grey_objects, obj);  
+        }
+    }
+    /*
+      * Avoid: grey_objects can resize; <use pop>
+        for (int i = 0; i < grey_objects->top; i++) {
+            trace_blacken_object(grey_objects, grey_objects->data[i]);
+        }
+    */
+    // Probing the root objects.
+    while (grey_objects->top > 0) {
+        object_t *obj = pop(grey_objects);
+        trace_blacken_object(grey_objects, obj);
+    }
+    // Free the temporary collection.
+    free_stack(grey_objects);
+    return;
+}
+
+// Trace the root objects for referenced child objects and mark them.
+void trace_blacken_object(stack_t *grey_objects, object_t *obj)
+{
+    if (grey_objects == NULL || obj == NULL) {
+        return;
+    }
+    switch(obj->datatype) {
+        case CHARACTER:
+        case BOOLEAN:
+        case REAL:
+        case INTEGER:
+        case STRING:
+            break;
+        case ARRAY:
+            // Mark the objects held by the array.
+            for (int i = 0; i < obj->value.array.capacity; i++) {
+                // Since an array object allows, random index insertions.
+                 if (obj->value.array.arr[i] != NULL) {
+                    // Mark the objects held by array.
+                    trace_mark_object(grey_objects, obj->value.array.arr[i]);
+                }
+            }
+            break;
+        default:
+            fprintf(stderr, "Invalid Object Read!\n");
+    }
+    return;
+}
+
+// Collect objects which are marked and to check if they can be traversed for sub objects.
+// Primary Use: called on grey_objects <collection of root>.
+void trace_mark_object(stack_t *grey_objects, object_t *obj)
+{
+    // If object already marked, do nothing.
+    if (grey_objects == NULL || obj == NULL || obj->is_marked) {
+        return;
+    }
+    obj->is_marked = true;
+    push(grey_objects, obj);
+    return;
+}
+
 // Sweep phase of the MnS.
 void sweep(vm_t *vm)
 {
