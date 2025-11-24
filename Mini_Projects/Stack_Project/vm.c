@@ -228,3 +228,15 @@ void sweep(vm_t *vm)
     stack_remove_nulls(vm->objects);
     return;
 }
+
+// Call the GC.
+void run_gc(vm_t *vm)
+{
+    if (vm == NULL) {
+      return;
+    }
+    mark(vm);
+    trace(vm);
+    sweep(vm);
+    return;
+}
