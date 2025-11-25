@@ -138,7 +138,7 @@ void print_obj(object_t *obj)
         case STRING:
             printf("[STRING]\n");
             printf("%s\n", obj->value.v_string);
-            printf("len: %d\n", strlen(obj->value.v_string));
+            printf("len: %ld\n", strlen(obj->value.v_string));
             break;
         case ARRAY:
             printf("[ARRAY]\n");

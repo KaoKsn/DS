@@ -60,7 +60,7 @@ void stack_remove_nulls(stack_t *stack)
         return;
     }
     int new_top = 0;
-    for (int i = 0; i < stack->top; i++) {
+    for (size_t i = 0; i < stack->top; i++) {
         if (stack->data[i] != NULL) {
             stack->data[new_top++] = stack->data[i];
         }
@@ -68,7 +68,7 @@ void stack_remove_nulls(stack_t *stack)
     stack->top = new_top;
     
     // NULL out the remaining pointers.
-    for (int i = stack->top; i < stack->capacity; i++) {
+    for (size_t i = stack->top; i < stack->capacity; i++) {
         stack->data[i] = NULL;
     }
     return;

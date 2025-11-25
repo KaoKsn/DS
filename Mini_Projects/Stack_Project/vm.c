@@ -30,13 +30,13 @@ void free_vm(vm_t *vm)
         return;
     }
     // Free all the frames in the VM.
-    for (int i = 0; i < vm->frames->top; i++) {
+    for (size_t i = 0; i < vm->frames->top; i++) {
         // Free every frame.
         free_frame(vm->frames->data[i]);
     }
     free_stack(vm->frames);
     // Free all the objects associated to the VM.
-    for (int i = 0; i < vm->objects->top; i++) {
+    for (size_t i = 0; i < vm->objects->top; i++) {
         free_obj(vm->objects->data[i]);
     }
     free_stack(vm->objects);
@@ -116,10 +116,10 @@ void mark(vm_t *vm)
     // vm->frames <==> Stack of frames.
     // vm->frames->data[i] <==> A frame(stack of references).
     // vm->frames->data[i]->references->data[i] <==> object in the frame.
-    for (int i = 0; i < vm->frames->top; i++) {
+    for (size_t i = 0; i < vm->frames->top; i++) {
         // NOTE: A frame(a stack element) is pushed as void*
         frame_t *frame = vm->frames->data[i];
-        for (int j = 0; j < frame->references->top; j++) {
+        for (size_t j = 0; j < frame->references->top; j++) {
             object_t *obj = frame->references->data[j];
             obj->is_marked = true;
         }
@@ -139,7 +139,7 @@ void trace(vm_t *vm)
     if (grey_objects == NULL) {
         return;
     }
-    for (int i = 0; i < vm->objects->top; i++) {
+    for (size_t i = 0; i < vm->objects->top; i++) {
         object_t *obj = vm->objects->data[i];
         // If the object is marked, push it to grey_objects stack.
         // This is done to ensure that we can mark any child objects that this object might have
@@ -150,7 +150,7 @@ void trace(vm_t *vm)
     }
     /*
       * Avoid: grey_objects can resize; <use pop>
-        for (int i = 0; i < grey_objects->top; i++) {
+        for (size_t i = 0; i < grey_objects->top; i++) {
             trace_blacken_object(grey_objects, grey_objects->data[i]);
         }
     */
@@ -212,7 +212,7 @@ void sweep(vm_t *vm)
     if (vm == NULL) {
         return;
     }
-    for (int i = 0; i < vm->objects->top; i++) {
+    for (size_t i = 0; i < vm->objects->top; i++) {
       // Cast the objects in the vm, and free if not referenced.
       object_t *obj = vm->objects->data[i];
       if (obj->is_marked) {
