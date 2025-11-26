@@ -17,15 +17,18 @@ LuaJIT 2.1.1763148144
 ## Project Structure
 <pre>
   .
-  ├── main.c
+  ├── makefile
   ├── objects.c
   ├── objects.h
   ├── README.md
   ├── stack.c
   ├── stack.h
+  ├── test_cycles.c
+  ├── test_mark_trace.c
+  ├── test_usual.c
   ├── vm.c
   └── vm.h
 </pre>
-1 directory, 8 files
 
+1 directory, 11 files
 
