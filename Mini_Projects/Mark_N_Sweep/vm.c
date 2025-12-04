@@ -17,6 +17,7 @@ vm_t *create_vm()
     }
     vm->objects = get_stack(8);
     if (vm->objects == NULL) {
+        free_stack(vm->frames);
         free(vm);
         fprintf(stderr, "Failed to initialize an object frame!\n");
         return NULL;
