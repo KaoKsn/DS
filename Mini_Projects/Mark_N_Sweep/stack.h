@@ -6,9 +6,9 @@
 typedef struct Stack stack_t;
 typedef struct Stack
 {
-  size_t top;
-  size_t capacity;
-  void **data;
+    size_t top;
+    size_t capacity;
+    void **data;
 } stack_t;
 
 stack_t *get_stack(size_t capacity);

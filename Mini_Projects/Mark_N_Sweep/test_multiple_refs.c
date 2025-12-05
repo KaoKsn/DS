@@ -5,7 +5,6 @@
 
 int main(void)
 {
-  //NOTE: Show that you can also free cycles.
   // Creating a virtual machine.
   vm_t *vm = create_vm();
 
@@ -60,7 +59,7 @@ int main(void)
   printf("Float Marked: %d\n\n", real->is_marked);
 
   // object boolean has now been freed.
-  bool check = boolean->is_marked; //-- <Dangerous!> Can be tested through valgrind.
+  bool check = boolean->is_marked;
 
   // Free the remaining objects at the end of the program.
   free_vm(vm);
