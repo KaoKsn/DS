@@ -70,7 +70,7 @@ frame_t *get_frame(vm_t *vm)
 void vm_push_frame(vm_t *vm, frame_t *frame)
 {
     if (vm == NULL || frame == NULL) {
-      return;
+        return;
     }
     push(vm->frames, (void *)frame);
     return;
@@ -214,16 +214,16 @@ void sweep(vm_t *vm)
         return;
     }
     for (size_t i = 0; i < vm->objects->top; i++) {
-      // Cast the objects in the vm, and free if not referenced.
-      object_t *obj = vm->objects->data[i];
-      if (obj->is_marked) {
-          // Reset is_marked i.e set them up for the next GC cycle.
-          obj->is_marked = false;
-      } else {
-          free_obj(obj);
-          // obj = NULL <not the right thing to do>
-          vm->objects->data[i] = NULL;
-      }
+        // Cast the objects in the vm, and free if not referenced.
+        object_t *obj = vm->objects->data[i];
+        if (obj->is_marked) {
+            // Reset is_marked i.e set them up for the next GC cycle.
+            obj->is_marked = false;
+        } else {
+            free_obj(obj);
+            // obj = NULL <not the right thing to do>
+            vm->objects->data[i] = NULL;
+        }
     }
     // Clean the stack.
     stack_remove_nulls(vm->objects);
@@ -234,7 +234,7 @@ void sweep(vm_t *vm)
 void run_gc(vm_t *vm)
 {
     if (vm == NULL) {
-      return;
+        return;
     }
     mark(vm);
     trace(vm);
