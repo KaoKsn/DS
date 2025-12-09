@@ -72,7 +72,7 @@ void insert(q_t *q, int value)
     if (q == NULL) {
         return;
     }
-    // If the queue is full.
+    // If the queue 1 less than full.
     if (q->front == (q->rear + 1) % q->size) {
         // Resize the queue.
         int *tmp = malloc(sizeof(int) * q->size * 2);
@@ -121,8 +121,10 @@ void printQ(q_t *q)
 
 void freeQ(q_t *q)
 {
-    if (q == NULL || q->arr == NULL)
+    if (q == NULL || q->arr == NULL || q->front == q->rear) {
+        printf("Empty!\n");
         return;
+    }
     free(q->arr);
     free(q);
 }
